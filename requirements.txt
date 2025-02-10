@@ -1,0 +1,5 @@
+flask
+spidev
+RPi.GPIO
+numpy
+Pillow

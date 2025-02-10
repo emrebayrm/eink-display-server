@@ -1,0 +1,3 @@
+[submodule "driver/e-Paper"]
+	path = driver/e-Paper
+	url = https://github.com/waveshare/e-Paper
