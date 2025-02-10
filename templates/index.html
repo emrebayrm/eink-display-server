@@ -4,12 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E Ink Image Upload</title>
+    <script>
+        function uploadImage(event) {
+            event.preventDefault();
+            let formData = new FormData(document.getElementById("uploadForm"));
+            fetch("/upload", { method: "POST", body: formData })
+                .then(response => response.text())
+                .then(() => {
+                    setTimeout(() => {
+                        location.reload(); // Auto-refresh after upload
+                    }, 2000);
+                });
+        }
+    </script>
 </head>
 <body>
     <h2>Upload an Image to Display on the E Ink Screen</h2>
-    <form action="/upload" method="post" enctype="multipart/form-data">
+    <form id="uploadForm" enctype="multipart/form-data">
         <input type="file" name="file" accept="image/png" required>
-        <button type="submit">Upload</button>
+        <button type="submit" onclick="uploadImage(event)">Upload</button>
     </form>
+    <h3>Last Uploaded Image:</h3>
+    <img src="/uploads/image.png" alt="Last Image" width="400">
 </body>
 </html>
