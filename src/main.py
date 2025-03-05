@@ -8,6 +8,8 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 display = EInkDisplay()
+display.init()
+os.listdir("./templates")
 
 @app.route("/")
 def index():
@@ -23,7 +25,7 @@ def upload_file():
         return "No selected file"
 
     if file:
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], "image.png")
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], "image.BMP")
         file.save(filepath)
         display.show_image(filepath)
         return "Image displayed!"
@@ -33,4 +35,5 @@ def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+    display.close()

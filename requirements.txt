@@ -3,3 +3,5 @@ spidev
 RPi.GPIO
 numpy
 Pillow
+gpiozero
+lgpio
