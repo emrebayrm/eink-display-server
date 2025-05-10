@@ -2,14 +2,45 @@ from waveshare_epd import epd7in5_V2
 from PIL import Image,ImageDraw,ImageFont, ImageOps
 import time
 import logging
+from enum import Enum
+from functools import wraps
 
 logging.basicConfig(level=logging.DEBUG)
 
+class DisplayState(Enum):
+    READY = 0
+    BUSY = 1
+    TURNED_OFF = 2
+
+def processing(method):
+    @wraps
+    def wrapper(self, *args, **kwargs):
+        if self.get_state() is not DisplayState.READY:
+            logging.warning("Device is busy")
+            return False
+        self._set_state(DisplayState.BUSY)
+        try:
+            return method(self, *args, **kwargs)
+        finally:
+            self._set_state(DisplayState.READY)
+            return False
+    return wrapper
+
 class EInkDisplay:
+    _state = DisplayState.TURNED_OFF
+
     def __init__(self):
+        self.epd = None
         pass
 
-    def init(self):
+    def get_state(self) -> DisplayState:
+        return self._state
+    
+    def _set_state(self, state: DisplayState):
+        self._state = state
+
+    @processing
+    def init(self) -> bool:
         self.epd = epd7in5_V2.EPD()
         logging.info("init and Clear")
         self.epd.init()
@@ -36,16 +67,24 @@ class EInkDisplay:
 
         self.epd.display(self.epd.getbuffer(Himage))
         self.sleep()
+        return True
 
-    def clear(self):
+    @processing
+    def clear(self) -> bool:
+        if self.epd is None:
+            logging.error("EPD not initialized")
+            return False
         self.epd.Clear()
+        return True
 
-    def show_image(self, image_path):
+
+    @processing
+    def show_image(self, image_path) -> bool:
         self.clear()
         self.epd.init_fast()
         # Open image and convert to grayscale
         image = Image.open(image_path).convert("L")  # "L" mode = 8-bit grayscale
-  #      image = Image.open(image_path)
+
         # Resize while maintaining aspect ratio
         image = ImageOps.fit(image, (self.epd.width, self.epd.height), Image.LANCZOS)
 
@@ -56,9 +95,12 @@ class EInkDisplay:
         self.epd.display(self.epd.getbuffer(image))
 
         self.sleep()
+        return True
 
     def sleep(self):
         time.sleep(2)
 
-    def close(self):
+    def close(self) -> bool:
         epd7in5_V2.epdconfig.module_exit(cleanup=True)
+        self._set_state(DisplayState.TURNED_OFF)
+        return True
