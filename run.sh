@@ -1,2 +1,3 @@
-source ./eink/bin/activate
-python3 src/main.py
+#!/usr/bin/env bash
+
+python3 ./src/main.py

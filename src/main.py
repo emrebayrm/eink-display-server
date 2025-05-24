@@ -18,7 +18,7 @@ def index():
     return render_template("index.html")
 
 @app.route("/reset")
-def index():
+def reset():
     try:
         display.clear()
         return jsonify({"status": "success", "message": "Display reset"}), 200

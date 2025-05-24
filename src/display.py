@@ -13,7 +13,7 @@ class DisplayState(Enum):
     TURNED_OFF = 2
 
 def processing(method):
-    @wraps
+    @wraps(method)
     def wrapper(self, *args, **kwargs):
         if self.get_state() is not DisplayState.READY:
             logging.warning("Device is busy")
