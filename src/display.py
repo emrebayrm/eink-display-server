@@ -19,11 +19,13 @@ def processing(method):
             logging.warning("Device is busy")
             return False
         self._set_state(DisplayState.BUSY)
+        res = False
         try:
-            return method(self, *args, **kwargs)
+            res = method(self, *args, **kwargs)
         finally:
-            self._set_state(DisplayState.READY)
-            return False
+            res = False
+        self._set_state(DisplayState.READY)
+        return res
     return wrapper
 
 class EInkDisplay:
