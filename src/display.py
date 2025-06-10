@@ -15,29 +15,27 @@ class DisplayState(Enum):
 def processing(method):
     @wraps(method)
     def wrapper(self, *args, **kwargs):
-        if self.get_state() is not DisplayState.READY:
+        if self.get_state() is DisplayState.BUSY:
             logging.warning("Device is busy")
             return False
         self._set_state(DisplayState.BUSY)
-        res = False
         try:
             res = method(self, *args, **kwargs)
         finally:
-            res = False
-        self._set_state(DisplayState.READY)
+            self._set_state(DisplayState.READY)
         return res
     return wrapper
 
 class EInkDisplay:
-    _state = DisplayState.TURNED_OFF
 
     def __init__(self):
+        self._state = DisplayState.TURNED_OFF
         self.epd = None
         pass
 
     def get_state(self) -> DisplayState:
         return self._state
-    
+
     def _set_state(self, state: DisplayState):
         self._state = state
 
